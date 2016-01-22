@@ -1,0 +1,25 @@
+.page {
+  &__content-wrapper {
+    margin: 0 auto;
+    padding: 30px 10px 10px 10px;
+    max-width: 600px;
+  }
+  &__content {
+
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .page {
+    &__content-wrapper {
+      max-width: 800px;
+      padding-top: 80px;
+    }
+    &__content {
+      margin-left: 220px;
+      &  p:first-of-type {
+        margin-top: 0;
+      }
+    }
+  }
+}

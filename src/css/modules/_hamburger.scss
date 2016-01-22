@@ -1,0 +1,86 @@
+body {
+	-webkit-transform:translate3d(0,0,0); // fix flicker in safari
+}
+
+$hamburger-height: 36px;
+$hamburger-width: 36px;
+$hamburger-background-color: transparent;
+$hamburger-bar-color: #a3a3a3;
+$hamburger-bar-separation: 8px;
+$hamburger-bar-width: 25px;
+$hamburger-bar-height: 3px;
+$hamburger-bar-border-radius: 2px;
+
+.hamburger {
+	height: $hamburger-height;
+	width: $hamburger-width;
+	padding: 0;
+
+	// .hamburger__button
+	&__button {
+		width: $hamburger-width;
+		height: $hamburger-height;
+		margin: 0;
+		border: none;
+		background-color: $hamburger-background-color;
+		position: relative;
+		&:focus {
+			outline: none;
+		}
+	}
+
+	// .hamburger__inner
+	&__inner {
+		display: block;
+		width: $hamburger-bar-width;
+		height: $hamburger-bar-height;
+		background-color: $hamburger-bar-color;
+		position: absolute;
+		top: 50%;
+		left: ($hamburger-width - $hamburger-bar-width) / 2;
+		margin-top: -#{$hamburger-bar-height / 2};
+		border-radius: $hamburger-bar-border-radius;
+		transition: background-color .4s ease-in-out .4s;
+		backface-visibility: hidden;
+		&:before,
+		&:after {
+			content: '';
+			display: block;
+			width: $hamburger-bar-width;
+			height: $hamburger-bar-height;
+			background-color: $hamburger-bar-color;
+			border-radius: $hamburger-bar-border-radius;
+			position: absolute;
+			transform-origin: 50% 50%;
+			transition: transform .5s ease-in-out, top .2s ease-in-out .3s;
+			// transition-delay: 0s;
+		}
+		&:after {
+			top: $hamburger-bar-separation;
+		}
+		&:before {
+			top: -$hamburger-bar-separation;
+		}
+	} // end .hamburger__inner
+
+	// .open .hamburger__inner
+	.open &__inner {
+		background-color: transparent;
+		transition: background-color .2s ease-out;
+		// transition-delay: 0s;
+		&:after,
+		&:before {
+			transform-origin: 50% 50%;
+			// transition-delay: .1s;
+			transition: top .2s ease-in-out, transform .5s ease-in-out 0s;
+			top: 0;
+		}
+		&:before {
+			transform: rotate(-135deg);
+
+		}
+		&:after {
+			transform: rotate(-225deg);
+		}
+	}
+}

@@ -1,0 +1,52 @@
+
+.wiki__content {
+  font-family: 'Open Sans', 'Source Sans Pro';
+	font-weight: 400;
+	line-height: 1.8;
+  font-size: 14px;
+  color: #252222;
+  max-width: 700px;
+  margin: 0 auto;
+
+  b {
+  	font-weight: 700;
+  }
+  a[id^="cite"] {
+    display: none;
+  }
+  a[id^="cite"] {
+    display: none;
+  }
+  .hatnote {
+    display: none !important;
+  }
+  .thumb {
+    display: none;
+  }
+
+  .mw-editsection {
+  	display: none;
+  }
+
+  table {
+    display: none;
+  }
+} // end .wiki__content
+
+.wiki__read-full-link {
+  display: block;
+  font-size:18px;
+  text-align: center;
+  text-decoration: none;
+}
+@media screen and (min-width: 768px) {
+  .wiki__content {
+    h2 {
+      font-size: 20px;
+      margin: 0;
+      font-weight: 300;
+      line-height: 1.75;
+    } // end  h2
+  }
+
+}
