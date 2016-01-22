@@ -1,13 +1,21 @@
 "use strict";
-var React = require('react');
-const { Router,
+import React from 'react';
+import ReactDOM from 'react-dom';
+// var Router = require('react-router').Router;
+// var Route = require('react-router').Route;
+// var IndexRoute = require('react-router').IndexRoute;
+// var Redirect = require('react-router').Redirect;
+// var Link = require('react-router').Link;
+// var IndexLink = require('react-router').IndexLink;
+// var Navigation = require('react-router').Navigation;
+import { Router,
         Route,
         IndexRoute,
         Redirect,
         Link,
         IndexLink,
         Navigation
-      } = ReactRouter
+      } from 'react-router'
 
 $(document).ready(function() {
   $('.navbar__toggle').on('click', function(e) {
@@ -21,32 +29,51 @@ $(document).ready(function() {
  * /search?rand
  * /w/:page_title
  */
-var Article = React.createClass({
-  componentWillMount: function() {
+
+ class Video extends React.Component {
+   static defaultProps = {
+     autoPlay: false,
+     maxLoops: 10,
+   }
+   static propTypes = {
+     autoPlay: React.PropTypes.bool.isRequired,
+     maxLoops: React.PropTypes.number.isRequired,
+     posterFrameSrc: React.PropTypes.string.isRequired,
+     videoSrc: React.PropTypes.string.isRequired,
+   }
+   state = {
+     loopsRemaining: this.props.maxLoops,
+   }
+ }
+ 
+class Article extends React.Component {
+  componentWillMount() {
     var title = this.props.params.title.split('+').join(' ');
     this.setState({title: title});
-  },
-  render: function() {
+  }
+
+  render() {
     return (
       <h2>This is an article with title {this.state.title}</h2>
     );
   }
-});
+};
 
-var Search = React.createClass({
-  render: function() {
+class Search extends React.Component {
+  render() {
     return (
       <h2>This is the search</h2>
     );
   }
-});
+};
 
-var TypeAheadList = React.createClass({
-  mixins: [Navigation],
-  handleClick: function(pageid) {
+class TypeAheadList extends React.Component {
+  // mixins: [Navigation],
+  handleClick(pageid) {
     this.props.onSubmit(pageid);
-  },
-  render: function() {
+  }
+
+  render() {
     var suggestions = [];
     if (this.props.data.error !== undefined) {
       suggestions.push(<li>{this.props.data.error}</li>);
@@ -61,18 +88,19 @@ var TypeAheadList = React.createClass({
       </ul>
     );
   }
-})
-var SearchForm = React.createClass({
-  contextTypes: {
-      router: React.PropTypes.func
-  },
-  handleSearchSubmit: function(searchTerm) {
+}
+
+class SearchForm extends React.Component {
+  //mixins: [Navigation],
+  state = {
+    typeAhead: {}
+  }
+
+  handleSearchSubmit(searchTerm) {
     this.context.router.transitionTo("search", {searchTerm: searchTerm});
-  },
-  getInitialState: function() {
-    return {typeAhead: {}}
-  },
-  fetchTypeAhead: function(value) {
+  }
+
+  fetchTypeAhead(value) {
     var url = 'http://en.wikipedia.org/w/api.php?format=json&action=query&generator=search&gsrnamespace=0&gsrlimit=5&prop=info|extracts&exintro&exsentences=3&exlimit=max&explaintext&gsrsearch=';
     url = url + value;
     $.ajax({
@@ -93,16 +121,18 @@ var SearchForm = React.createClass({
         console.log(status, err.toString());
       }
     })
-  },
-  handleInput: function(e) {
+  }
+
+  handleInput(e) {
     var value = e.target.value;
     if(value.length >= 3) {
       this.fetchTypeAhead(e.target.value);
     } else {
       this.setState({typeAhead: {}})
     }
-  },
-  render: function() {
+  }
+
+  render() {
     return (
       <form className="navbar__search-form" onChange={this.handleInput}>
         <div className="typeahead">
@@ -116,10 +146,14 @@ var SearchForm = React.createClass({
     </form>
     )
   }
-});
+};
+
+SearchForm.contextTypes = {
+    router: React.PropTypes.func.isRequired
+};
 // Scripts here
 var App = React.createClass({
-  render: function () {
+  render() {
     return (
       <div>
       <header className="header navbar">

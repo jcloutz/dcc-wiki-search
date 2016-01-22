@@ -24,9 +24,6 @@
   "javascript": {
     "external": [
       "https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/react/0.14.6/react.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/react/0.14.6/react-dom.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/react-router/1.0.3/ReactRouter.min.js",
       "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.22/require.min.js"
     ]
   }
