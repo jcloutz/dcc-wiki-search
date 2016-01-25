@@ -11,10 +11,7 @@ body {
 /* line 8, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
 h1 {
   color: #FFB26B;
-}
-
-/* line 12, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
-h1 {
+  font-size: 25px;
   margin: 0;
   position: relative;
   zoom: 1;
@@ -23,7 +20,7 @@ h1 {
   font-family: Raleway;
 }
 
-/* line 21, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
+/* line 19, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
 h2,
 h3,
 h4,
@@ -32,20 +29,20 @@ h5 {
   font-family: Raleway;
 }
 
-/* line 28, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
+/* line 26, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
 a {
   color: #FFB26B;
   transition: color .5s ease-in-out;
   cursor: pointer;
 }
 
-/* line 32, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
+/* line 30, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
 a:hover {
   color: #D88F4C;
 }
 
 @media screen and (min-width: 768px) {
-  /* line 37, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
+  /* line 35, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
   h1 {
     float: left;
     width: 200px;
@@ -53,13 +50,13 @@ a:hover {
     padding: 0 20px 40px 0;
     position: relative;
   }
-  /* line 45, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
+  /* line 43, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
   h1:before {
     content: '';
     display: table;
     clear: both;
   }
-  /* line 50, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
+  /* line 48, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
   h1:after {
     content: '';
     width: 4px;
@@ -179,18 +176,18 @@ body {
   margin: 0 auto;
 }
 
-/* line 11, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_wiki.scss */
+/* line 10, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_wiki.scss */
 .wiki__content b {
   font-weight: 700;
 }
 
-/* line 14, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_wiki.scss */
-.wiki__content a[id^="cite"] {
-  display: none;
+/* line 13, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_wiki.scss */
+.wiki__content a {
+  color: #9C9C9C;
 }
 
 /* line 17, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_wiki.scss */
-.wiki__content a[id^="cite"] {
+.wiki__content sup {
   display: none;
 }
 
@@ -220,10 +217,11 @@ body {
   font-size: 18px;
   text-align: center;
   text-decoration: none;
+  color: #FFB26B !important;
 }
 
 @media screen and (min-width: 768px) {
-  /* line 44, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_wiki.scss */
+  /* line 45, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_wiki.scss */
   .wiki__content h2 {
     font-size: 20px;
     margin: 0;
@@ -478,12 +476,14 @@ body {
 .result__title {
   font-size: 20px;
   font-weight: 300;
+  text-decoration: none;
 }
 
-/* line 21, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_result.scss */
+/* line 22, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_result.scss */
 .result__link {
   display: inline-block;
   margin: 15px 20px 0 0;
+  text-decoration: none;
 }
 
 /* line 1, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typeahead.scss */
