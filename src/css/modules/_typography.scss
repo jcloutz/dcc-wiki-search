@@ -13,7 +13,9 @@ h1 {
   zoom: 1;
   padding: 0 0 20px 0;
   font-weight: 300;
-  font-family: Raleway
+  font-family: Raleway;
+  word-break: normal;
+  word-wrap: break-word;
 }
 
 h2,

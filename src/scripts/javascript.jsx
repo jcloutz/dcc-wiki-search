@@ -22,12 +22,25 @@ $(document).ready(function() {
  * /search?rand
  * /w/:page_title
  */
+var Loading = React.createClass({
+  render: function() {
+    return (
+      <div className="loading">
+        <svg className="loading-icon"  x="0" y="0" viewBox="0 0 50 50">
+          <path d="M46.6 29h3C47.8 40.9 37.5 50 25 50S2.2 40.9 0.3 29h3C5.2 39.2 14.2 47 25 47S44.8 39.2 46.6 29z"/>
+          <path d="M3.4 21h-3C2.2 9.1 12.5 0 25 0s22.8 9.1 24.7 21h-3C44.8 10.8 35.8 3 25 3S5.2 10.8 3.4 21z"/>
+        </svg>
+      </div>
+    )
+  }
+});
 
 var Article = React.createClass({
   getInitialState: function() {
     return {
       pageTitle: this.props.params.pageTitle,
       article: null,
+      loaded: false
     }
   },
 
@@ -36,7 +49,7 @@ var Article = React.createClass({
   },
 
   componentWillReceiveProps(next) {
-    this.setState({pageTitle: next.params.pageTitle}, function() {
+    this.setState({loaded: false, pageTitle: next.params.pageTitle}, function() {
       this.fetchArticle();
     })
 
@@ -56,7 +69,7 @@ var Article = React.createClass({
         };
         console.log(data);
         console.log(article);
-        this.setState({article: article});
+        this.setState({loaded: true, article: article});
       },
       error: function(xhr, status, err) {
         console.log(status, err.toString());
@@ -66,7 +79,7 @@ var Article = React.createClass({
 
   render: function() {
 
-    if (this.state.article !== null) {
+    if (this.state.loaded === true) {
       var normalizedTitle = this.state.article.title.replace(/\ /gi, '_');
       return (
         <div>
@@ -81,7 +94,7 @@ var Article = React.createClass({
       );
     } else {
       return (
-        <p>Loading</p>
+        <Loading />
       );
     }
 
@@ -113,13 +126,14 @@ var Search = React.createClass({
     return {
       data: {},
       searchTerm: this.props.params.searchTerm,
+      loaded: false,
     }
   },
   componentDidMount: function() {
     this.fetchSearchResults();
   },
   componentWillReceiveProps: function(next) {
-    this.setState({searchTerm: next.params.searchTerm}, function() {
+    this.setState({loaded: false, searchTerm: next.params.searchTerm}, function() {
       this.fetchSearchResults();
     });
   },
@@ -139,7 +153,7 @@ var Search = React.createClass({
         results.sort(function(a, b) {
           return a.index - b.index;
         })
-        this.setState({data: results})
+        this.setState({loaded: true, data: results})
       },
       error: (xhr, status, err) => {
         console.log(status, err.toString());
@@ -151,14 +165,18 @@ var Search = React.createClass({
     for(var i = 0; i < this.state.data.length; i++) {
       results.push(<SearchResult data={this.state.data[i]} />)
     }
-    return (
-      <div>
-        <h1>Results</h1>
-        <div className="page__content">
+    if(this.state.loaded === true) {
+      return(
+        <div>
+          <h1>Results</h1>
+          <div className="page__content">
           {results}
+          </div>
         </div>
-      </div>
-    );
+      );
+    } else {
+      return (<Loading />)
+    }
   }
 });
 
@@ -273,49 +291,6 @@ var SearchForm = React.createClass({
   }
 });
 
-var Random = React.createClass({
-  getInitialState: function() {
-    return {
-      data: {},
-    }
-  },
-
-  componentWillReceiveProps: function(next) {
-    this.fetchRandom();
-  },
-
-  componentWillMount: function() {
-    this.fetchRandom();
-  },
-  fetchRandom: function() {
-    $.ajax({
-      url: "http://en.wikipedia.org/w/api.php?action=query&prop=extracts|info&format=json&exsentences=5&exlimit=max&exintro=&generator=random&grnnamespace=0&grnredirect=&grnlimit=10&explaintext",
-      dataType: 'jsonp',
-      cache: false,
-      success: (data) => {
-        this.setState({data: data.query.pages})
-        console.log(data);
-      },
-      error: (xhr, status, err) => {
-        console.log(status, err.toString());
-      }
-    })
-  },
-  render: function() {
-    var results = [];
-    for(var key in this.state.data) {
-      results.push(<SearchResult data={this.state.data[key]} />)
-    }
-    return (
-      <div>
-        <h1>Random Articles</h1>
-        <div className="page__content">
-          {results}
-        </div>
-      </div>
-    );
-  }
-})
 // Scripts here
 var App = React.createClass({
   contextTypes: {
@@ -336,6 +311,24 @@ var App = React.createClass({
     console.log('transitioning to: ', location);
     this.context.history.push(location);
   },
+
+  fetchRandom: function(e) {
+    e.preventDefault();
+    $.ajax({
+      url: "http://en.wikipedia.org/w/api.php?format=json&action=query&prop=info|pageimages|extracts&pilimit=max&exintro&exsentences=3&exlimit=max&explaintext&list=random&rnnamespace=0",
+      dataType: 'jsonp',
+      cache: false,
+      success: (data) => {
+        var page = data.query.random[0].title.replace(/\ /gi, '_');
+        console.log('Random Article: ', data.query.random[0].title);
+        this.context.history.push('/article/'+page);
+      },
+      error: (xhr, status, err) => {
+        console.log(status, err.toString());
+      }
+    })
+  },
+
   render: function() {
     return (
       <div>
@@ -367,7 +360,7 @@ var App = React.createClass({
      <div className="navbar__module navbar__module--left">
     <nav>
     <ul>
-    <li><Link to="/random" className="navbar__link"><i className="ion-shuffle"></i> Random</Link></li>
+    <li><a href="#" className="navbar__link" onClick={this.fetchRandom}><i className="ion-shuffle"></i> Random</a></li>
   </ul>
   </nav>
   </div>
@@ -396,7 +389,6 @@ var App = React.createClass({
 ReactDOM.render(
   <Router history={browserHistory}>
     <Route name="index" path="/" component={App}>
-      <Route name="random" path="/random" component={Random} />
       <Route name="search" path="/search/:searchTerm" component={Search} />
       <Route name="article" path="/article/:pageTitle" component={Article} />
     </Route>
