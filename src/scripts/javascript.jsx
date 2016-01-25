@@ -8,14 +8,7 @@ import ReactDOM from 'react-dom';
 // var Link = require('react-router').Link;
 // var IndexLink = require('react-router').IndexLink;
 // var Navigation = require('react-router').Navigation;
-import { Router,
-        Route,
-        IndexRoute,
-        Redirect,
-        Link,
-        IndexLink,
-        Navigation
-      } from 'react-router'
+import { Router, Route, Link, browserHistory } from 'react-router'
 
 $(document).ready(function() {
   $('.navbar__toggle').on('click', function(e) {
@@ -30,56 +23,158 @@ $(document).ready(function() {
  * /w/:page_title
  */
 
- class Video extends React.Component {
-   static defaultProps = {
-     autoPlay: false,
-     maxLoops: 10,
-   }
-   static propTypes = {
-     autoPlay: React.PropTypes.bool.isRequired,
-     maxLoops: React.PropTypes.number.isRequired,
-     posterFrameSrc: React.PropTypes.string.isRequired,
-     videoSrc: React.PropTypes.string.isRequired,
-   }
-   state = {
-     loopsRemaining: this.props.maxLoops,
-   }
- }
- 
-class Article extends React.Component {
-  componentWillMount() {
-    var title = this.props.params.title.split('+').join(' ');
-    this.setState({title: title});
-  }
+var Article = React.createClass({
+  getInitialState: function() {
+    return {
+      pageTitle: this.props.params.pageTitle,
+      article: null,
+    }
+  },
 
-  render() {
+  componentWillMount: function() {
+    this.fetchArticle();
+  },
+
+  componentWillReceiveProps(next) {
+    this.setState({pageTitle: next.params.pageTitle}, function() {
+      this.fetchArticle();
+    })
+
+  },
+
+  fetchArticle: function() {
+    var url = "https://en.wikipedia.org/w/api.php?action=parse&format=json&section=0&disabletoc&disablelimitreport&sectionpreview&page=" + this.state.pageTitle
+    $.ajax({
+      url: url,
+      cache: false,
+      dataType: 'jsonp',
+      success: (data) => {
+        var articleText = data.parse.text['*'].replace(/(\/wiki\/)|(\/w\/index.php\?title\=)/gi, '#/article/').replace(/\&amp\;redirect\=no/gi, '');
+        var article = {
+          title: data.parse.title,
+          text: { __html: articleText },
+        };
+        console.log(data);
+        console.log(article);
+        this.setState({article: article});
+      },
+      error: function(xhr, status, err) {
+        console.log(status, err.toString());
+      }
+    });
+  },
+
+  render: function() {
+
+    if (this.state.article !== null) {
+      var normalizedTitle = this.state.article.title.replace(/\ /gi, '_');
+      return (
+        <div>
+          <h1>{this.state.article.title}</h1>
+          <div className="page__content">
+            <div className="wiki__content">
+              <div dangerouslySetInnerHTML={this.state.article.text}></div>
+              <a className="wiki__read-full-link" href={"https://en.wikipedia.org/wiki/" + normalizedTitle} target="_blank">Read Full Article</a>
+            </div>
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <p>Loading</p>
+      );
+    }
+
+  }
+});
+
+var SearchResult = React.createClass({
+  render: function() {
+    // console.log(this.props.data);
+    var result = this.props.data;
+    var normalizedTitle = result.title.replace(/\ /gi, '_');
+    return(
+      <div key={result.pageid} className="result">
+        <Link to={"/article/" + normalizedTitle} className="result__title">
+          {result.title}
+        </Link>
+        <div className="result__description">
+          {result.extract}
+        </div>
+        <Link to={"/article/" + normalizedTitle} className="result__link"><i className="ion-ios-arrow-right"></i> Read Excerpt</Link>
+        <a href={"https://en.wikipedia.org/wiki/" + normalizedTitle} className="result__link" target="_blank"><i className="ion-ios-arrow-right"></i> Read on Wikipedia</a>
+      </div>
+    )
+  }
+});
+
+var Search = React.createClass({
+  getInitialState: function() {
+    return {
+      data: {},
+      searchTerm: this.props.params.searchTerm,
+    }
+  },
+  componentDidMount: function() {
+    this.fetchSearchResults();
+  },
+  componentWillReceiveProps: function(next) {
+    this.setState({searchTerm: next.params.searchTerm}, function() {
+      this.fetchSearchResults();
+    });
+  },
+  fetchSearchResults: function() {
+    var url = "http://en.wikipedia.org/w/api.php?format=json&action=query&generator=search&gsrnamespace=0&gsrlimit=10&prop=info|pageimages|extracts&pilimit=max&exintro&exsentences=3&exlimit=max&explaintext&srinterwiki=false&gsrsearch=" + this.state.searchTerm;
+    $.ajax({
+      url: url,
+      dataType: 'jsonp',
+      crossDomain: true,
+      cache: false,
+      success: (data) => {
+        console.log('Search Data', data);
+        var results = [];
+        for(var key in data.query.pages) {
+          results.push(data.query.pages[key]);
+        }
+        results.sort(function(a, b) {
+          return a.index - b.index;
+        })
+        this.setState({data: results})
+      },
+      error: (xhr, status, err) => {
+        console.log(status, err.toString());
+      }
+    })
+  },
+  render: function() {
+    var results = [];
+    for(var i = 0; i < this.state.data.length; i++) {
+      results.push(<SearchResult data={this.state.data[i]} />)
+    }
     return (
-      <h2>This is an article with title {this.state.title}</h2>
+      <div>
+        <h1>Results</h1>
+        <div className="page__content">
+          {results}
+        </div>
+      </div>
     );
   }
-};
+});
 
-class Search extends React.Component {
-  render() {
-    return (
-      <h2>This is the search</h2>
-    );
-  }
-};
-
-class TypeAheadList extends React.Component {
+var TypeAheadList = React.createClass({
   // mixins: [Navigation],
-  handleClick(pageid) {
-    this.props.onSubmit(pageid);
-  }
+  handleClick: function(searchTerm) {
+    this.props.onClick(searchTerm);
+  },
 
-  render() {
+  render: function() {
     var suggestions = [];
     if (this.props.data.error !== undefined) {
       suggestions.push(<li>{this.props.data.error}</li>);
     } else {
-      for(var prop in this.props.data) {
-        suggestions.push(<li key={this.props.data[prop].pageid} onClick={this.handleClick.bind(null, this.props.data[prop].pageid)}>{this.props.data[prop].title}</li>);
+      for(var i = 0; i < this.props.data.length; i++) {
+        suggestions.push(<li key={this.props.data[i].pageid} onClick={this.handleClick.bind(null, this.props.data[i].title)}>{this.props.data[i].title}</li>);
       }
     }
     return(
@@ -88,29 +183,66 @@ class TypeAheadList extends React.Component {
       </ul>
     );
   }
-}
+});
 
-class SearchForm extends React.Component {
-  //mixins: [Navigation],
-  state = {
-    typeAhead: {}
-  }
+var SearchForm = React.createClass({
+  getInitialState: function() {
+    return {
+      typeAhead: {},
+      searchTerm: ''
+    }
+  },
 
-  handleSearchSubmit(searchTerm) {
-    this.context.router.transitionTo("search", {searchTerm: searchTerm});
-  }
+  handleSearchSubmit: function() {
+    var searchTerm = this.state.searchTerm;
+    console.log("submitted term: ", searchTerm);
+    this.setState({typeAhead: {}, searchTerm: ''});
+    this.props.onSubmit(searchTerm);
+  },
 
-  fetchTypeAhead(value) {
-    var url = 'http://en.wikipedia.org/w/api.php?format=json&action=query&generator=search&gsrnamespace=0&gsrlimit=5&prop=info|extracts&exintro&exsentences=3&exlimit=max&explaintext&gsrsearch=';
+  handleTypeAheadClick: function(searchTerm) {
+    this.setState({searchTerm: searchTerm}, function() {
+      this.handleSearchSubmit();
+    });
+  },
+
+  handleTextInput: function(e) {
+    var value = e.target.value;
+    this.setState({searchTerm: e.target.value}, function() {
+      if(value.length >= 3) {
+        this.fetchTypeAhead(e.target.value);
+      } else {
+        this.setState({typeAhead: {}});
+      }
+    });
+  },
+
+  clearForm: function(e) {
+    e.preventDefault();
+    // this.refs.searchInput.value = '';
+    this.setState({typeAhead: {}, searchTerm: ''});
+  },
+
+  fetchTypeAhead: function(value) {
+    var url = 'http://en.wikipedia.org/w/api.php?format=json&action=query&generator=search&gsrnamespace=0&gsrlimit=5&prop=info|extracts&exintro&exsentences=3&exlimit=max&explaintext&srwhat=title&srinterwiki=false&gsrsearch=';
     url = url + value;
     $.ajax({
       dataType: 'jsonp',
       url: url,
       crossDomain: true,
+      cache: true,
       success: (data) => {
         if(data.query !== undefined) {
           var pages = data.query.pages;
-          this.setState({typeAhead: data.query.pages});
+          var results = [];
+          for (var key in pages) {
+            results.push(pages[key]);
+          }
+
+          results.sort(function(a, b) {
+            return a.index - b.index;
+          })
+          this.setState({typeAhead: results});
         } else {
           this.setState({typeAhead: {
             error: 'No Suggestions'
@@ -121,39 +253,90 @@ class SearchForm extends React.Component {
         console.log(status, err.toString());
       }
     })
-  }
+  },
 
-  handleInput(e) {
-    var value = e.target.value;
-    if(value.length >= 3) {
-      this.fetchTypeAhead(e.target.value);
-    } else {
-      this.setState({typeAhead: {}})
-    }
-  }
-
-  render() {
+  render: function() {
+    var term = this.state.searchTerm;
     return (
-      <form className="navbar__search-form" onChange={this.handleInput}>
+      <form className="navbar__search-form" onSubmit={this.handleSearchSubmit} >
         <div className="typeahead">
-          <input type="text" placeholder="Search Wikipedia" />
+          <input type="text" ref="searchInput" placeholder="Search Wikipedia" value={term} onChange={this.handleTextInput}/>
           <div className="typeahead__container">
-            <TypeAheadList data={this.state.typeAhead} onSubmit={this.handleSearchSubmit}/>
+            <TypeAheadList data={this.state.typeAhead} onClick={this.handleTypeAheadClick}/>
+          </div>
         </div>
-      </div>
-      <button className="navbar__search-form-clear" value="clear" id="clear-form"><i className="ion-ios-close"></i> <span className="navbar__search-form--hide">Clear</span></button>
-      <button className="navbar__search-form-submit" value="submit"><i className="ion-ios-search"></i> <span className="navbar__search-form--hide">Search</span></button>
+        <button className="navbar__search-form-submit" value="submit"><i className="ion-ios-search"></i> <span className="navbar__search-form--hide">Search</span></button>
+      <button className="navbar__search-form-clear" value="clear" id="clear-form" onClick={this.clearForm} ><i className="ion-ios-close"></i> <span className="navbar__search-form--hide">Clear</span></button>
+
     </form>
     )
   }
-};
+});
 
-SearchForm.contextTypes = {
-    router: React.PropTypes.func.isRequired
-};
+var Random = React.createClass({
+  getInitialState: function() {
+    return {
+      data: {},
+    }
+  },
+
+  componentWillReceiveProps: function(next) {
+    this.fetchRandom();
+  },
+
+  componentWillMount: function() {
+    this.fetchRandom();
+  },
+  fetchRandom: function() {
+    $.ajax({
+      url: "http://en.wikipedia.org/w/api.php?action=query&prop=extracts|info&format=json&exsentences=5&exlimit=max&exintro=&generator=random&grnnamespace=0&grnredirect=&grnlimit=10&explaintext",
+      dataType: 'jsonp',
+      cache: false,
+      success: (data) => {
+        this.setState({data: data.query.pages})
+        console.log(data);
+      },
+      error: (xhr, status, err) => {
+        console.log(status, err.toString());
+      }
+    })
+  },
+  render: function() {
+    var results = [];
+    for(var key in this.state.data) {
+      results.push(<SearchResult data={this.state.data[key]} />)
+    }
+    return (
+      <div>
+        <h1>Random Articles</h1>
+        <div className="page__content">
+          {results}
+        </div>
+      </div>
+    );
+  }
+})
 // Scripts here
 var App = React.createClass({
-  render() {
+  contextTypes: {
+    location: React.PropTypes.object,
+    history: React.PropTypes.object
+  },
+
+  getContext() {
+    return {
+      location: this.props.location,
+      history: this.props.history
+    }
+  },
+
+  handleSearchSubmit: function(searchTerm) {
+    var location = '/search/' + searchTerm;
+    console.log('search submitted.');
+    console.log('transitioning to: ', location);
+    this.context.history.push(location);
+  },
+  render: function() {
     return (
       <div>
       <header className="header navbar">
@@ -191,7 +374,7 @@ var App = React.createClass({
 
      <div className="navbar__module navbar__module--right">
 
-    <SearchForm />
+    <SearchForm onSubmit={this.handleSearchSubmit}/>
   </div>
 
    </div>
@@ -211,11 +394,11 @@ var App = React.createClass({
 });
 
 ReactDOM.render(
-  <Router>
+  <Router history={browserHistory}>
     <Route name="index" path="/" component={App}>
-      <Route name="random" path="/random" component={Search} />
+      <Route name="random" path="/random" component={Random} />
       <Route name="search" path="/search/:searchTerm" component={Search} />
-      <Route name="article" path="/article/:title" component={Article} />
+      <Route name="article" path="/article/:pageTitle" component={Article} />
     </Route>
   </Router>,
   document.getElementById('app')

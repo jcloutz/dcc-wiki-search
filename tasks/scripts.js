@@ -5,7 +5,7 @@ var source = require('vinyl-source-stream');
 module.exports = function(gulp, plugins, settings) {
   return function() {
     gulp.task('scripts', () => {
-      return browserify({entries: settings.paths.source + 'scripts/javascript.jsx', extensions: ['.jsx'], debug: false})
+      return browserify({entries: settings.paths.source + 'scripts/javascript.jsx', extensions: ['.jsx'], debug: true})
         .transform('babelify', {presets: ['es2015', 'react']})
         .bundle()
         .pipe(source('bundle.js'))
