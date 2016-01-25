@@ -18,9 +18,11 @@ h1 {
   padding: 0 0 20px 0;
   font-weight: 300;
   font-family: Raleway;
+  word-break: normal;
+  word-wrap: break-word;
 }
 
-/* line 19, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
+/* line 21, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
 h2,
 h3,
 h4,
@@ -29,20 +31,20 @@ h5 {
   font-family: Raleway;
 }
 
-/* line 26, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
+/* line 28, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
 a {
   color: #FFB26B;
   transition: color .5s ease-in-out;
   cursor: pointer;
 }
 
-/* line 30, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
+/* line 32, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
 a:hover {
   color: #D88F4C;
 }
 
 @media screen and (min-width: 768px) {
-  /* line 35, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
+  /* line 37, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
   h1 {
     float: left;
     width: 200px;
@@ -50,13 +52,13 @@ a:hover {
     padding: 0 20px 40px 0;
     position: relative;
   }
-  /* line 43, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
+  /* line 45, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
   h1:before {
     content: '';
     display: table;
     clear: both;
   }
-  /* line 48, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
+  /* line 50, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_typography.scss */
   h1:after {
     content: '';
     width: 4px;
@@ -531,12 +533,50 @@ body {
   }
 }
 
-/* line 13, stdin */
+@-webkit-keyframes loading-icon-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+
+@keyframes loading-icon-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+
+/* line 13, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_loading.scss */
+.loading-icon {
+  width: 40px;
+  -webkit-animation: loading-icon-spin 2s infinite linear;
+          animation: loading-icon-spin 2s infinite linear;
+  display: block;
+  margin: 0 auto;
+  -webkit-transform-origin: center center;
+          transform-origin: center center;
+}
+
+/* line 19, /Users/jeremyc/develop/Code/fcc-wiki-search/src/css/modules/_loading.scss */
+.loading-icon path {
+  fill: #A3A3A3;
+}
+
+/* line 14, stdin */
 * {
   box-sizing: border-box;
 }
 
-/* line 20, stdin */
+/* line 21, stdin */
 #fcc-logo {
   fill-rule: evenodd;
   clip-rule: evenodd;
@@ -544,7 +584,7 @@ body {
   stroke-miterlimit: 1.41421;
 }
 
-/* line 26, stdin */
+/* line 27, stdin */
 .fcc-logo-path {
   fill: #a3a3a3;
 }
