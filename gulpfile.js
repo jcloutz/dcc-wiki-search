@@ -41,7 +41,7 @@ gulp.task('default', ['html', 'css', 'scripts'], function() {
   });
   gulp.watch([settings.paths.source + '**/*.{html,jade,haml,md}', './template.html', './settings.json'], ['html']);
   gulp.watch(settings.paths.source + "css/**/*.{css,scss}", ['css']);
-  gulp.watch(settings.paths.source + 'scripts/*.js', ['scripts']);
+  gulp.watch(settings.paths.source + 'scripts/*.{js,jsx}', ['scripts']);
 });
 
 gulp.task('build', ['html', 'css', 'scripts']);

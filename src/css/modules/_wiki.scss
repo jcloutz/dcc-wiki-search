@@ -7,14 +7,14 @@
   color: #252222;
   max-width: 700px;
   margin: 0 auto;
-
   b {
   	font-weight: 700;
   }
-  a[id^="cite"] {
-    display: none;
+  a {
+    color: #9C9C9C;
+
   }
-  a[id^="cite"] {
+  sup {
     display: none;
   }
   .hatnote {
@@ -38,6 +38,7 @@
   font-size:18px;
   text-align: center;
   text-decoration: none;
+  color: #FFB26B !important;
 }
 @media screen and (min-width: 768px) {
   .wiki__content {
