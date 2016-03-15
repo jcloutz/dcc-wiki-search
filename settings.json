@@ -2,7 +2,7 @@
   "outputDir": "output",
   "title": "FCC Boilerplate",
 
-  "base_url": "github.io",
+  "base_url": "http://jeremyc/github.io/fcc-wiki-search",
   "html": {
     "html_classes": [],
     "head": [
